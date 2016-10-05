@@ -8,7 +8,7 @@ public class Main {
 	
 	static public void main(String[] args) {
 		// Carregar arquivo FCL
-		String filename = "fcl/tipper.fcl";
+		String filename = "fcl/riskmatrix.fcl";
 		FIS fis = FIS.load(filename, true);
 		
 		if(fis == null) {
@@ -20,12 +20,12 @@ public class Main {
 		//Mostrar
 		JFuzzyChart.get().chart(fis);
 		
-		fis.setVariable("service", 3);
-		fis.setVariable("food", 7);
+		fis.setVariable("possibilidade", 3.98);
+		fis.setVariable("impacto", 2.74);
 		
 		fis.evaluate();
 		
-		Variable tip = fis.getVariable("tip");
+		Variable tip = fis.getVariable("risco");
 		JFuzzyChart.get().chart(tip, tip.getDefuzzifier(), true);
 		
 		System.out.println(fis);

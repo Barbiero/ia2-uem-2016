@@ -1,0 +1,70 @@
+FUNCTION_BLOCK logica
+
+VAR_INPUT  
+	risco_mercado : REAL;
+	risco_credito : REAL;
+	risco_liquidez : REAL;
+	
+END_VAR
+	
+VAR_OUTPUT 
+	risco_final : REAL;
+END_VAR
+	
+
+
+	
+//risco_mercado: se baixo, o mercado está a favor do produto a ser comprado
+FUZZIFY risco_mercado
+	TERM baixo	:= TRIAN 0 0 3;
+	TERM medio	:= TRIAN 2.5 3.25 4.5;
+	TERM alto	:= TRIAN 3.5 10 10;
+END_FUZZIFY
+
+//risco_credito: risco de não haver crédito para a produçao do produto
+FUZZIFY risco_credito
+	TERM baixo	:= TRIAN 0 0 5;
+	TERM medio	:= TRIAN 3 6 8;
+	TERM alto	:= TRIAN 7 10 10;
+END_FUZZIFY
+
+//risco_liquidez: risco de não obter lucro
+FUZZIFY risco_liquidez
+	TERM baixo	:= TRIAN 0 0 6;
+	TERM medio	:= TRIAN 4 7 9;
+	TERM alto	:= TRIAN 7.5 10 10;	
+END_FUZZIFY
+	
+DEFUZZIFY risco_final
+	TERM baixo	:= TRIAN 0 0 5;
+	TERM medio	:= TRIAN 2 5 8;
+	TERM alto	:= TRIAN 5 10 10;
+	METHOD : COG;
+	DEFAULT := 5;
+END_DEFUZZIFY
+
+
+RULEBLOCK regras
+	AND : MIN;
+	ACT : MIN;
+	ACCU : MAX;
+	
+	RULE 1 : IF risco_mercado IS alto THEN risco_final IS alto;
+	RULE 2 : IF risco_credito IS NOT alto AND risco_mercado IS NOT alto AND risco_liquidez IS NOT alto THEN risco_final IS baixo;
+	RULE 3 : IF risco_credito IS alto OR risco_liquidez IS alto THEN risco_final IS medio;
+	RULE 4 : IF risco_credito IS alto AND risco_mercado IS medio AND risco_liquidez IS alto THEN risco_final IS alto;
+	RULE 5 : IF risco_mercado IS baixo AND risco_credito IS NOT alto THEN risco_final IS baixo;
+	
+	/*
+	RULE 1 : IF risco_mercado IS baixo AND risco_liquidez IS baixo AND risco_credito IS baixo THEN risco_final IS baixo;
+	RULE 2 : IF risco_mercado IS alto THEN risco_final IS alto;
+	RULE 3 : IF risco_credito IS baixo AND risco_liquidez IS medio THEN risco_final IS baixo;
+	RULE 4 : IF risco_credito IS medio THEN risco_final IS medio;
+	RULE 5 : IF risco_mercado IS medio OR (risco_credito IS alto AND risco_liquidez IS baixo) THEN risco_final IS medio;
+	*/
+	
+	
+
+END_RULEBLOCK
+	
+END_FUNCTION_BLOCK

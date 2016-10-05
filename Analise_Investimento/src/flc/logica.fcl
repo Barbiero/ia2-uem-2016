@@ -7,7 +7,7 @@ VAR_INPUT
 END_VAR
 	
 VAR_OUTPUT 
-	risco : REAL;	
+	risco_final : REAL;	
 END_VAR
 	
 FUZZIFY risco_mercado
@@ -17,26 +17,36 @@ FUZZIFY risco_mercado
 END_FUZZIFY
 
 FUZZIFY risco_credito
-	TERM baixo	:= ;
-	TERM medio	:= ;
-	TERM alto	:= ;	
+	TERM baixo	:= (0, 0) (3, 1) (5, 0);
+	TERM medio	:= (4.5, 0) (7, 0) (8, 0);
+	TERM alto	:= (7, 0) (8.5, 1) (10, 0);	
 END_FUZZIFY
 
 FUZZIFY risco_liquidez
-	TERM baixo	:= ;
-	TERM medio	:= ;
-	TERM alto	:= ;	
+	TERM baixo	:= (0, 0) (3, 1) (6, 0);
+	TERM medio	:= (4, 0) (6, 1) (8, 0);
+	TERM alto	:= (8, 0) (9, 1) (10, 0);	
 END_FUZZIFY
 	
-DEFUZZIFY risco
-	TERM baixo	:= ;
-	TERM medio	:= ;
-	TERM alto	:= ;
+DEFUZZIFY risco_final
+	TERM baixo	:= (0, 0) (3.5, 1) (5, 0);
+	TERM medio	:= (3, 0) (5, 1) (7, 0);
+	TERM alto	:= (6, 0) (8, 1) (10, 0);
 	METHOD : COG;
 	DEFAULT := 0;
 END_DEFUZZIFY
 	
-RULEBLOCK nº1
+RULEBLOCK regras
+	AND : MIN;
+	ACT : MIN;
+	ACCU : MAX;
+	
+	RULE 1 : IF risco_mercado IS baixo AND risco_liquidez IS baixo AND risco_credito IS baixo THEN risco_final IS baixo;
+	RULE 2 : IF risco_mercado IS alto THEN risco_final IS alto;
+	RULE 3 : IF risco_credito IS baixo AND risco_liquidez IS medio THEN risco_final IS baixo;
+	RULE 4 : IF risco_credito IS medio THEN risco_final IS medio;
+	RULE 5 : IF risco_mercado IS medio OR (risco_credito IS alto AND risco_liquidez IS baixo) THEN risco_final IS medio;
+	
 END_RULEBLOCK
 	
 END_FUNCTION_BLOCK

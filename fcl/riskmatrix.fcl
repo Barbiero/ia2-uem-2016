@@ -1,0 +1,72 @@
+FUNCTION_BLOCK riskmatrix
+
+VAR_INPUT 
+	possibilidade : REAL;
+	impacto : REAL;
+END_VAR
+	
+VAR_OUTPUT
+	risco : REAL;
+END_VAR
+
+FUZZIFY possibilidade
+	TERM muito_baixa	:= TRAPE 0.0 0.0 0.5 1.5;
+	TERM baixa			:= TRIAN 0.5 1.5 2.5;
+	TERM media			:= TRIAN 1.5 2.5 3.5;
+	TERM alta			:= TRIAN 2.5 3.5 4.5;
+	TERM muito_alta		:= TRAPE 3.5 4.5 5.0 5.0;
+END_FUZZIFY
+
+FUZZIFY impacto
+	TERM negligivel		:= TRAPE 0.0 0.0 0.5 1.5;
+	TERM baixo			:= TRIAN 0.5 1.5 2.5;
+	TERM medio			:= TRIAN 1.5 2.5 3.5;
+	TERM alto			:= TRIAN 2.5 3.5 4.5;
+	TERM catastrofico	:= TRAPE 3.5 4.5 5.0 5.0;
+END_FUZZIFY
+
+DEFUZZIFY risco
+	TERM baixo		:= TRIAN 0 1 2;
+	TERM medio		:= TRIAN 1 2 3;
+	TERM meio_alto	:= TRIAN 2 3 4;
+	TERM alto		:= TRIAN 3 4 5;
+END_DEFUZZIFY
+
+
+
+RULEBLOCK regras
+
+	RULE 1 : IF possibilidade IS muito_baixa AND impacto IS negligivel THEN risco IS baixo;
+	RULE 2 : IF possibilidade IS muito_baixa AND impacto IS baixo THEN risco IS baixo;
+	RULE 3 : IF possibilidade IS muito_baixa AND impacto IS medio THEN risco IS medio;
+	RULE 4 : IF possibilidade IS muito_baixa AND impacto IS alto THEN risco IS medio;
+	RULE 5 : IF possibilidade IS muito_baixa AND impacto IS catastrofico THEN risco IS meio_alto;
+	
+	RULE 6 : IF possibilidade IS baixa AND impacto IS negligivel THEN risco IS baixo;
+	RULE 7 : IF possibilidade IS baixa AND impacto IS baixo THEN risco IS baixo;
+	RULE 8 : IF possibilidade IS baixa AND impacto IS medio THEN risco IS medio;
+	RULE 9 : IF possibilidade IS baixa AND impacto IS alto THEN risco IS medio;
+	RULE 10 : IF possibilidade IS baixa AND impacto IS catastrofico THEN risco IS meio_alto;
+	
+	RULE 11 : IF possibilidade IS media AND impacto IS negligivel THEN risco IS baixo;
+	RULE 12 : IF possibilidade IS media AND impacto IS baixo THEN risco IS baixo;
+	RULE 13 : IF possibilidade IS media AND impacto IS medio THEN risco IS medio;
+	RULE 14 : IF possibilidade IS media AND impacto IS alto THEN risco IS meio_alto;
+	RULE 15 : IF possibilidade IS media AND impacto IS catastrofico THEN risco IS meio_alto;
+	
+	RULE 16 : IF possibilidade IS alta AND impacto IS negligivel THEN risco IS medio;
+	RULE 17 : IF possibilidade IS alta AND impacto IS baixo THEN risco IS medio;
+	RULE 18 : IF possibilidade IS alta AND impacto IS medio THEN risco IS meio_alto;
+	RULE 19 : IF possibilidade IS alta AND impacto IS alto THEN risco IS meio_alto;
+	RULE 20 : IF possibilidade IS alta AND impacto IS catastrofico THEN risco IS alto;
+	
+	RULE 21 : IF possibilidade IS muito_alta AND impacto IS negligivel THEN risco IS meio_alto;
+	RULE 22 : IF possibilidade IS muito_alta AND impacto IS baixo THEN risco IS meio_alto;
+	RULE 23 : IF possibilidade IS muito_alta AND impacto IS medio THEN risco IS alto;
+	RULE 24 : IF possibilidade IS muito_alta AND impacto IS alto THEN risco IS alto;
+	RULE 25 : IF possibilidade IS muito_alta AND impacto IS catastrofico THEN risco IS alto;
+	
+
+END_RULEBLOCK
+	
+END_FUNCTION_BLOCK
